@@ -1,7 +1,5 @@
 package br.com.attornatus.peopleapi.service;
 
-import br.com.attornatus.peopleapi.dto.endereco.EnderecoCreateDTO;
-import br.com.attornatus.peopleapi.dto.endereco.EnderecoDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaCreateDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaDTO;
 import br.com.attornatus.peopleapi.model.Endereco;
@@ -12,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +27,9 @@ public class PessoaService {
     public PessoaDTO findPersonById (Integer idPessoa) {
         return pessoaRepository.findById(idPessoa).stream()
                 .map(pessoa -> {
-                    PessoaDTO pessoaDTO = new PessoaDTO();
+                    PessoaDTO pessoaDTO;
                     pessoaDTO = objectMapper.convertValue(pessoa, PessoaDTO.class);
-                    pessoaDTO.setEnderecoCreateDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
+                    pessoaDTO.setEnderecoDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
                     return pessoaDTO;
                 })
                 .findFirst()
@@ -43,7 +41,7 @@ public class PessoaService {
                 .map(pessoa -> {
                     PessoaDTO pessoaDTO;
                     pessoaDTO = objectMapper.convertValue(pessoa, PessoaDTO.class);
-                    pessoaDTO.setEnderecoCreateDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
+                    pessoaDTO.setEnderecoDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
                     return pessoaDTO;
                 })
                 .collect(Collectors.toList());
@@ -52,18 +50,16 @@ public class PessoaService {
     public PessoaDTO create (PessoaCreateDTO pessoaCreateDTO) {
         Pessoa pessoa = converterDTO(pessoaCreateDTO);
 
-        if (pessoaCreateDTO.getEnderecoCreateDTOList() != null) {
-            List<EnderecoCreateDTO> enderecoCreateDTOList = pessoaCreateDTO.getEnderecoCreateDTOList().stream()
-                    .peek(enderecoCreateDTO -> {
-                        List<Endereco>  enderecoList = Collections.singletonList(enderecoRepository.save(objectMapper.convertValue(enderecoCreateDTO, Endereco.class)));
-                        pessoa.setEnderecoList(enderecoList);
+        if (pessoaCreateDTO.getEnderecoDTOList() != null) {
+            List<Endereco> enderecoList = pessoaCreateDTO.getEnderecoDTOList().stream()
+                            .map(enderecoDTO -> enderecoRepository.save(objectMapper.convertValue(enderecoDTO, Endereco.class)))
+                            .toList();
 
-                    })
-                    .toList();
-
+            pessoa.setEnderecoList(enderecoList);
             pessoaRepository.save(pessoa);
+
             PessoaDTO pessoaDTO = retornarDTO(pessoa);
-            pessoaDTO.setEnderecoCreateDTOList(enderecoCreateDTOList);
+            pessoaDTO.setEnderecoDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
 
             return pessoaDTO;
         } else {
@@ -78,7 +74,24 @@ public class PessoaService {
         pessoaLocalizada.setNome(pessoaCreateDTO.getNome());
         pessoaLocalizada.setDataNascimento(pessoaCreateDTO.getDataNascimento());
 
-        return retornarDTO(pessoaRepository.save(pessoaLocalizada));
+        List<Pessoa> pessoaList = new ArrayList<>();
+        pessoaList.add(pessoaLocalizada);
+
+        List<Endereco> enderecosLocalizado = pessoaCreateDTO.getEnderecoDTOList().stream()
+                .map(enderecoDTO -> {
+                    pessoaRepository.findById(enderecoDTO.getIdEndereco());
+                    return objectMapper.convertValue(enderecoDTO, Endereco.class);
+                })
+                .map(endereco -> {
+                    endereco.setPessoaList(pessoaList);
+                    return enderecoRepository.save(endereco);
+                })
+                .toList();
+
+        PessoaDTO pessoaDTO = retornarDTO(pessoaLocalizada);
+        pessoaDTO.setEnderecoDTOList(objectMapper.convertValue(enderecosLocalizado, List.class));
+
+        return pessoaDTO;
     }
 
     public Pessoa converterDTO (PessoaCreateDTO pessoaCreateDTO) {

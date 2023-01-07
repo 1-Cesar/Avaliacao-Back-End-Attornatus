@@ -39,7 +39,7 @@ public class PessoaController {
     }
 
     @Operation(summary = "Atualiza uma pessoa através de seu id", description = "Atualiza uma pessoa, presente no banco de dados, através de seu id")
-    @GetMapping("/atualizar-pessoa/{idPessoa}")
+    @PutMapping("/atualizar-pessoa/{idPessoa}")
     public ResponseEntity<PessoaDTO> update(@PathVariable("idPessoa") Integer idPessoa,
                                             @RequestBody @Valid PessoaCreateDTO pessoaCreateDTO) {
         return ResponseEntity.ok(pessoaService.update(pessoaCreateDTO, idPessoa));
