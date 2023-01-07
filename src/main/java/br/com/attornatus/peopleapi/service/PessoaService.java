@@ -27,12 +27,25 @@ public class PessoaService {
     private final EnderecoRepository enderecoRepository;
 
     public PessoaDTO findPersonById (Integer idPessoa) {
-        return retornarDTO(findById(idPessoa));
+        return pessoaRepository.findById(idPessoa).stream()
+                .map(pessoa -> {
+                    PessoaDTO pessoaDTO = new PessoaDTO();
+                    pessoaDTO = objectMapper.convertValue(pessoa, PessoaDTO.class);
+                    pessoaDTO.setEnderecoCreateDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
+                    return pessoaDTO;
+                })
+                .findFirst()
+                .orElseThrow();
     }
 
     public List<PessoaDTO> listAll () {
         return pessoaRepository.findAll().stream()
-                .map(this::retornarDTO)
+                .map(pessoa -> {
+                    PessoaDTO pessoaDTO;
+                    pessoaDTO = objectMapper.convertValue(pessoa, PessoaDTO.class);
+                    pessoaDTO.setEnderecoCreateDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
+                    return pessoaDTO;
+                })
                 .collect(Collectors.toList());
     }
 
