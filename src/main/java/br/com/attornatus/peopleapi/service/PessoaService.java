@@ -1,5 +1,7 @@
 package br.com.attornatus.peopleapi.service;
 
+import br.com.attornatus.peopleapi.dto.endereco.EnderecoCreateDTO;
+import br.com.attornatus.peopleapi.dto.endereco.EnderecoDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaCreateDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaDTO;
 import br.com.attornatus.peopleapi.model.Endereco;
@@ -10,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +39,24 @@ public class PessoaService {
     public PessoaDTO create (PessoaCreateDTO pessoaCreateDTO) {
         Pessoa pessoa = converterDTO(pessoaCreateDTO);
 
-        List<Endereco> enderecoList = pessoaCreateDTO.getEnderecoCreateDTOList().stream()
-                .map(enderecoCreateDTO -> enderecoRepository.save(objectMapper.convertValue(enderecoCreateDTO, Endereco.class)))
-                .toList();
+        if (pessoaCreateDTO.getEnderecoCreateDTOList() != null) {
+            List<EnderecoCreateDTO> enderecoCreateDTOList = pessoaCreateDTO.getEnderecoCreateDTOList().stream()
+                    .peek(enderecoCreateDTO -> {
+                        List<Endereco>  enderecoList = Collections.singletonList(enderecoRepository.save(objectMapper.convertValue(enderecoCreateDTO, Endereco.class)));
+                        pessoa.setEnderecoList(enderecoList);
 
-        pessoa.setEnderecoList(enderecoList);
+                    })
+                    .toList();
 
-        return retornarDTO(pessoaRepository.save(pessoa));
+            pessoaRepository.save(pessoa);
+            PessoaDTO pessoaDTO = retornarDTO(pessoa);
+            pessoaDTO.setEnderecoCreateDTOList(enderecoCreateDTOList);
+
+            return pessoaDTO;
+        } else {
+            pessoaRepository.save(pessoa);
+            return retornarDTO(pessoa);
+        }
     }
 
     public PessoaDTO update (PessoaCreateDTO pessoaCreateDTO, Integer idPessoa) {
