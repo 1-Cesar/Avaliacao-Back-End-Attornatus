@@ -1,5 +1,6 @@
 package br.com.attornatus.peopleapi.dto.endereco;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class EnderecoDTO extends EnderecoCreateDTO {
 
-    @Schema(description = "Identificador do endereço")
+    @Schema(description = "Identificador do endereço", hidden = true)
     @NotNull
     private Integer idEndereco;
 }

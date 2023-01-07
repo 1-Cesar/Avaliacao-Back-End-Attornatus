@@ -1,6 +1,7 @@
 package br.com.attornatus.peopleapi.dto.pessoa;
 
 import br.com.attornatus.peopleapi.dto.endereco.EnderecoCreateDTO;
+import br.com.attornatus.peopleapi.dto.endereco.EnderecoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,5 +27,5 @@ public class PessoaCreateDTO {
     LocalDate dataNascimento;
 
     @Schema(description = "Endereço da pessoa")
-    private List<EnderecoCreateDTO> enderecoCreateDTOList;
+    private List<EnderecoDTO> enderecoDTOList;
 }
