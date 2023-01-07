@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class EnderecoDTO extends EnderecoCreateDTO {
 
-    @Schema(description = "Identificador do endereço", example = "1")
+    @Schema(description = "Identificador do endereço")
     @NotNull
     private Integer idEndereco;
 }

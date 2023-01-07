@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -23,9 +23,7 @@ public class PessoaCreateDTO {
     String nome;
 
     @Schema(description = "Data de nascimento da pessoa", example = "10/10/23")
-    @NotBlank
-    @Past
-    Date dataNascimento;
+    LocalDate dataNascimento;
 
     @Schema(description = "Endereço da pessoa")
     private List<EnderecoCreateDTO> enderecoCreateDTOList;
