@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
@@ -32,4 +33,8 @@ public class EnderecoCreateDTO {
     @NotBlank
     @Size(min = 3, max = 50)
     private String cidade;
+
+    @Schema(description = "Define se o endereço é principal ou não", example = "false", hidden = true)
+    @NotNull
+    private Boolean principal;
 }
