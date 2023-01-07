@@ -51,9 +51,21 @@ public class PessoaService {
         Pessoa pessoa = converterDTO(pessoaCreateDTO);
 
         if (pessoaCreateDTO.getEnderecoDTOList() != null) {
+
             List<Endereco> enderecoList = pessoaCreateDTO.getEnderecoDTOList().stream()
-                            .map(enderecoDTO -> enderecoRepository.save(objectMapper.convertValue(enderecoDTO, Endereco.class)))
-                            .toList();
+                    .map(enderecoDTO -> {
+                        enderecoDTO.setPrincipal(false);
+                        return enderecoRepository.save(objectMapper.convertValue(enderecoDTO, Endereco.class));
+                    })
+                    .toList();
+
+            enderecoList.stream()
+                    .map(enderecoDTO -> {
+                        enderecoDTO.setPrincipal(true);
+                        return enderecoRepository.save(objectMapper.convertValue(enderecoDTO, Endereco.class));
+                    })
+                    .findFirst()
+                    .orElseThrow();
 
             pessoa.setEnderecoList(enderecoList);
             pessoaRepository.save(pessoa);

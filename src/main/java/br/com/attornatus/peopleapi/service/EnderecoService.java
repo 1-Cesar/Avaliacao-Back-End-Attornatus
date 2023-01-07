@@ -33,13 +33,30 @@ public class EnderecoService {
         return enderecoDTOS;
     }
 
-    public Boolean postEnderecoPrincipal(Integer idPessoa, Integer idEndereco) {
+    public List<EnderecoDTO> postEnderecoPrincipal(Integer idPessoa, Integer idEndereco) {
         Pessoa pessoa = pessoaRepository.findById(idPessoa).get();
-        List<EnderecoDTO> enderecoDTOS = pessoa.getEnderecoList().stream()
-                .filter(endereco -> endereco.getIdEndereco().equals(idEndereco))
-                .map(this::retornarDTO)
+
+        List<EnderecoDTO> enderecoPrincipalDTOS2 = pessoa.getEnderecoList().stream()
+                .filter(endereco -> !endereco.getIdEndereco().equals(idEndereco))
+                .map(endereco -> {
+                    endereco.setPrincipal(false);
+                    enderecoRepository.save(endereco);
+                    return objectMapper.convertValue(endereco, EnderecoDTO.class);
+                })
                 .toList();
-        return true;
+
+        List<EnderecoDTO> enderecoPrincipalDTOS = new ArrayList<>(pessoa.getEnderecoList().stream()
+                .filter(endereco -> endereco.getIdEndereco().equals(idEndereco))
+                .map(endereco -> {
+                    endereco.setPrincipal(true);
+                    enderecoRepository.save(endereco);
+                    return objectMapper.convertValue(endereco, EnderecoDTO.class);
+                })
+                .toList());
+
+        enderecoPrincipalDTOS.addAll(enderecoPrincipalDTOS2);
+
+        return enderecoPrincipalDTOS;
     }
 
     public EnderecoDTO create (EnderecoCreateDTO enderecoCreateDTO, Integer idPessoa) {
