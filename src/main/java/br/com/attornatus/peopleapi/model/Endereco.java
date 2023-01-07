@@ -29,6 +29,9 @@ public class Endereco {
     @Column(name = "cidade")
     private String cidade;
 
+    @Column(name = "principal")
+    private Boolean principal;
+
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "pessoa_x_endereco",
