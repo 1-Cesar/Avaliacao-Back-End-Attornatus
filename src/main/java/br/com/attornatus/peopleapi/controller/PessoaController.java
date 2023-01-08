@@ -2,8 +2,12 @@ package br.com.attornatus.peopleapi.controller;
 
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaCreateDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaDTO;
+import br.com.attornatus.peopleapi.dto.pessoa.PessoaPutDTO;
 import br.com.attornatus.peopleapi.service.PessoaService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -41,7 +45,7 @@ public class PessoaController {
     @Operation(summary = "Atualiza uma pessoa através de seu id", description = "Atualiza uma pessoa, presente no banco de dados, através de seu id")
     @PutMapping("/atualizar-pessoa/{idPessoa}")
     public ResponseEntity<PessoaDTO> update(@PathVariable("idPessoa") Integer idPessoa,
-                                            @RequestBody @Valid PessoaCreateDTO pessoaCreateDTO) {
+                                            @RequestBody @Valid PessoaPutDTO pessoaCreateDTO) {
         return ResponseEntity.ok(pessoaService.update(pessoaCreateDTO, idPessoa));
     }
 }
