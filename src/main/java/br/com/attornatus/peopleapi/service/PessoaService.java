@@ -2,6 +2,7 @@ package br.com.attornatus.peopleapi.service;
 
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaCreateDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaDTO;
+import br.com.attornatus.peopleapi.dto.pessoa.PessoaPutDTO;
 import br.com.attornatus.peopleapi.model.Endereco;
 import br.com.attornatus.peopleapi.model.Pessoa;
 import br.com.attornatus.peopleapi.repository.EnderecoRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,7 +82,7 @@ public class PessoaService {
         }
     }
 
-    public PessoaDTO update (PessoaCreateDTO pessoaCreateDTO, Integer idPessoa) {
+    public PessoaDTO update (PessoaPutDTO pessoaCreateDTO, Integer idPessoa) {
         Pessoa pessoaLocalizada = findById(idPessoa);
 
         pessoaLocalizada.setNome(pessoaCreateDTO.getNome());
@@ -91,7 +93,8 @@ public class PessoaService {
 
         List<Endereco> enderecosLocalizado = pessoaCreateDTO.getEnderecoDTOList().stream()
                 .map(enderecoDTO -> {
-                    pessoaRepository.findById(enderecoDTO.getIdEndereco());
+                    Endereco endereco = enderecoRepository.findById(enderecoDTO.getIdEndereco()).orElseThrow();
+                    enderecoDTO.setPrincipal(endereco.getPrincipal());
                     return objectMapper.convertValue(enderecoDTO, Endereco.class);
                 })
                 .map(endereco -> {
