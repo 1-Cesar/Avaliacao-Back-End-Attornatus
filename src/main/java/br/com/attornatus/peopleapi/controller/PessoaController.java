@@ -3,6 +3,7 @@ package br.com.attornatus.peopleapi.controller;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaCreateDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaDTO;
 import br.com.attornatus.peopleapi.dto.pessoa.PessoaPutDTO;
+import br.com.attornatus.peopleapi.exceptions.RegraDeNegocioException;
 import br.com.attornatus.peopleapi.service.PessoaService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -32,20 +33,20 @@ public class PessoaController {
 
     @Operation(summary = "Recupera uma pessoa através de seu id", description = "Recupera uma pessoa, presente no banco de dados, através de seu id")
     @GetMapping("/listar-pessoa/{idPessoa}")
-    public ResponseEntity<PessoaDTO> listById(@PathVariable("idPessoa") Integer idPessoa) {
+    public ResponseEntity<PessoaDTO> listById(@PathVariable("idPessoa") Integer idPessoa) throws RegraDeNegocioException {
         return ResponseEntity.ok(pessoaService.findPersonById(idPessoa));
     }
 
     @Operation(summary = "Realiza o cadastro de uma pessoa", description = "Realiza o cadastro de uma pessoa, salvando esta na base de dados")
     @PostMapping("/cadastrar")
-    public ResponseEntity<PessoaDTO> create (@RequestBody @Valid PessoaCreateDTO pessoaCreateDTO) {
+    public ResponseEntity<PessoaDTO> create (@RequestBody @Valid PessoaCreateDTO pessoaCreateDTO) throws RegraDeNegocioException {
         return ResponseEntity.ok(pessoaService.create(pessoaCreateDTO));
     }
 
     @Operation(summary = "Atualiza uma pessoa através de seu id", description = "Atualiza uma pessoa, presente no banco de dados, através de seu id")
     @PutMapping("/atualizar-pessoa/{idPessoa}")
     public ResponseEntity<PessoaDTO> update(@PathVariable("idPessoa") Integer idPessoa,
-                                            @RequestBody @Valid PessoaPutDTO pessoaCreateDTO) {
+                                            @RequestBody @Valid PessoaPutDTO pessoaCreateDTO) throws RegraDeNegocioException {
         return ResponseEntity.ok(pessoaService.update(pessoaCreateDTO, idPessoa));
     }
 }
