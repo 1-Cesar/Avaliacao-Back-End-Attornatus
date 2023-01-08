@@ -70,14 +70,14 @@ public class PessoaService {
                     .orElseThrow(() -> new RegraDeNegocioException("Erro na requisição"));
 
             pessoa.setEnderecoList(enderecoList);
-            pessoaRepository.save(pessoa);
+            pessoa = pessoaRepository.save(pessoa);
 
             PessoaDTO pessoaDTO = retornarDTO(pessoa);
             pessoaDTO.setEnderecoDTOList(objectMapper.convertValue(pessoa.getEnderecoList(), List.class));
 
             return pessoaDTO;
         } else {
-            pessoaRepository.save(pessoa);
+            pessoa = pessoaRepository.save(pessoa);
             return retornarDTO(pessoa);
         }
     }
