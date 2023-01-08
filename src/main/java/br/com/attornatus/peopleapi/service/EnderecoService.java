@@ -2,10 +2,10 @@ package br.com.attornatus.peopleapi.service;
 
 import br.com.attornatus.peopleapi.dto.endereco.EnderecoCreateDTO;
 import br.com.attornatus.peopleapi.dto.endereco.EnderecoDTO;
+import br.com.attornatus.peopleapi.exceptions.RegraDeNegocioException;
 import br.com.attornatus.peopleapi.model.Endereco;
 import br.com.attornatus.peopleapi.model.Pessoa;
 import br.com.attornatus.peopleapi.repository.EnderecoRepository;
-import br.com.attornatus.peopleapi.repository.PessoaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,20 +21,19 @@ public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
 
-    private final PessoaRepository pessoaRepository;
-
     private final PessoaService pessoaService;
 
-    public List<EnderecoDTO> listAllById(Integer idPessoa) {
-        Pessoa pessoa = pessoaRepository.findById(idPessoa).get();
+    public List<EnderecoDTO> listAllById(Integer idPessoa) throws RegraDeNegocioException {
+        Pessoa pessoa = pessoaService.findById(idPessoa);
         List<EnderecoDTO> enderecoDTOS = pessoa.getEnderecoList().stream()
                 .map(this::retornarDTO)
                 .toList();
         return enderecoDTOS;
     }
 
-    public List<EnderecoDTO> postEnderecoPrincipal(Integer idPessoa, Integer idEndereco) {
-        Pessoa pessoa = pessoaRepository.findById(idPessoa).get();
+    public List<EnderecoDTO> postEnderecoPrincipal(Integer idPessoa, Integer idEndereco) throws RegraDeNegocioException {
+        Pessoa pessoa = pessoaService.findById(idPessoa);
+        findById(idEndereco);
 
         List<EnderecoDTO> enderecoPrincipalDTOS2 = pessoa.getEnderecoList().stream()
                 .filter(endereco -> !endereco.getIdEndereco().equals(idEndereco))
@@ -59,9 +58,15 @@ public class EnderecoService {
         return enderecoPrincipalDTOS;
     }
 
-    public EnderecoDTO create (EnderecoCreateDTO enderecoCreateDTO, Integer idPessoa) {
+    public EnderecoDTO create (EnderecoCreateDTO enderecoCreateDTO, Integer idPessoa) throws RegraDeNegocioException {
         Pessoa pessoaLocalizada = pessoaService.findById(idPessoa);
         Endereco endereco = converterDTO(enderecoCreateDTO);
+
+        if (pessoaLocalizada.getEnderecoList().size() != 0) {
+            endereco.setPrincipal(false);
+        } else {
+            endereco.setPrincipal(true);
+        }
 
         List<Pessoa> pessoaList = new ArrayList<>();
         pessoaList.add(pessoaLocalizada);
@@ -76,5 +81,10 @@ public class EnderecoService {
 
     public EnderecoDTO retornarDTO (Endereco endereco) {
         return objectMapper.convertValue(endereco, EnderecoDTO.class);
+    }
+
+    public Endereco findById(Integer idEndereco) throws RegraDeNegocioException {
+        return enderecoRepository.findById(idEndereco)
+                .orElseThrow(() -> new RegraDeNegocioException("Endereço não encontrada"));
     }
 }

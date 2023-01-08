@@ -16,7 +16,7 @@ public class EnderecoCreateDTO {
 
     @Schema(description = "Logradouro do endereço", example = "Rua")
     @NotBlank
-    @Size(min = 6, max = 100)
+    @Size(min = 3, max = 100)
     private String logradouro;
 
     @Schema(description = "CEP do endereço", example = "11111-111")
@@ -35,6 +35,5 @@ public class EnderecoCreateDTO {
     private String cidade;
 
     @Schema(description = "Define se o endereço é principal ou não", example = "false", hidden = true)
-    @NotNull
     private Boolean principal;
 }
