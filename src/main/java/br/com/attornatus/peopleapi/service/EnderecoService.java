@@ -23,6 +23,7 @@ public class EnderecoService {
 
     private final PessoaService pessoaService;
 
+    //Lista os endereços com baso no Id da pessoa, ao mesmo tempo converte o retorno para DTO
     public List<EnderecoDTO> listAllById(Integer idPessoa) throws RegraDeNegocioException {
         Pessoa pessoa = pessoaService.findById(idPessoa);
         List<EnderecoDTO> enderecoDTOS = pessoa.getEnderecoList().stream()
@@ -31,6 +32,9 @@ public class EnderecoService {
         return enderecoDTOS;
     }
 
+    /*Define um endereco como principal e ao mesmo tempo define os demais como "secundarios". True define como principal e false "segundario"
+     Após, junta as duas categorias em uma única lista para melhor visualização dos endereços.
+     */
     public List<EnderecoDTO> postEnderecoPrincipal(Integer idPessoa, Integer idEndereco) throws RegraDeNegocioException {
         Pessoa pessoa = pessoaService.findById(idPessoa);
         findById(idEndereco);
@@ -58,6 +62,7 @@ public class EnderecoService {
         return enderecoPrincipalDTOS;
     }
 
+    //Adiciona um endereço para o usuário
     public EnderecoDTO create (EnderecoCreateDTO enderecoCreateDTO, Integer idPessoa) throws RegraDeNegocioException {
         Pessoa pessoaLocalizada = pessoaService.findById(idPessoa);
         Endereco endereco = converterDTO(enderecoCreateDTO);
@@ -83,6 +88,7 @@ public class EnderecoService {
         return objectMapper.convertValue(endereco, EnderecoDTO.class);
     }
 
+    //Recupera um endereço por id ou caso contrario, lança uma exceção
     public Endereco findById(Integer idEndereco) throws RegraDeNegocioException {
         return enderecoRepository.findById(idEndereco)
                 .orElseThrow(() -> new RegraDeNegocioException("Endereço não encontrada"));

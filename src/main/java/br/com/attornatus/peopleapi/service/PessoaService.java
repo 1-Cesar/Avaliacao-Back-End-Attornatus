@@ -26,6 +26,7 @@ public class PessoaService {
 
     private final EnderecoRepository enderecoRepository;
 
+    //Recupera uma pessoa com base em seu id ou lança uma exceção quando não encontrada
     public PessoaDTO findPersonById (Integer idPessoa) throws RegraDeNegocioException {
         return pessoaRepository.findById(idPessoa).stream()
                 .map(pessoa -> {
@@ -38,6 +39,7 @@ public class PessoaService {
                 .orElseThrow(() -> new RegraDeNegocioException("Pessoa não encontrada"));
     }
 
+    //Recupera todas as pessoas da base de dados
     public List<PessoaDTO> listAll () {
         return pessoaRepository.findAll().stream()
                 .map(pessoa -> {
@@ -49,6 +51,7 @@ public class PessoaService {
                 .collect(Collectors.toList());
     }
 
+    //cria uma pessoa, podendo criar junto (ou nao) um ou mais endereços.
     public PessoaDTO create (PessoaCreateDTO pessoaCreateDTO) throws RegraDeNegocioException {
         Pessoa pessoa = converterDTO(pessoaCreateDTO);
 
@@ -82,6 +85,7 @@ public class PessoaService {
         }
     }
 
+    //atualiza o cadastro de uma pessoa na base de dados
     public PessoaDTO update (PessoaPutDTO pessoaCreateDTO, Integer idPessoa) throws RegraDeNegocioException {
         Pessoa pessoaLocalizada = findById(idPessoa);
         PessoaDTO pessoaDTO;
@@ -127,6 +131,7 @@ public class PessoaService {
         return objectMapper.convertValue(pessoa, PessoaDTO.class);
     }
 
+    //Recupera uma pessoa por id ou caso contrario, lança uma exceção
     public Pessoa findById(Integer idPessoa) throws RegraDeNegocioException {
         return pessoaRepository.findById(idPessoa)
                 .orElseThrow(() -> new RegraDeNegocioException("Pessoa não encontrada"));
